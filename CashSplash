@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CashSplash NG</title>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a1929 0%, #1a2332 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: #1e2736;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Login Page */
+        .auth-page {
+            padding: 40px 30px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            background: linear-gradient(135deg, #4a90e2, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .logo p {
+            color: #9aa5b8;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #e1e8f0;
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #2d3748;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #2d3748;
+            color: #e1e8f0;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4a90e2;
+            background: #374151;
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .form-group select option {
+            background: #2d3748;
+            color: #e1e8f0;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(74, 144, 226, 0.4);
+        }
+
+        /* Dashboard */
+        .dashboard {
+            background: #0f1419;
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #1a2332, #2d3748);
+            padding: 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .welcome h2 {
+            font-size: 18px;
+            font-weight: normal;
+            color: #e1e8f0;
+        }
+
+        .welcome p {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 3px;
+            color: #9aa5b8;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .icon-btn {
+            background: rgba(74, 144, 226, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            color: #4a90e2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #2d3748, #1a2332);
+            border: 2px solid #4a90e2;
+            margin: 20px;
+            padding: 30px 25px;
+            border-radius: 20px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3);
+        }
+
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 10px;
+            color: #9aa5b8;
+        }
+
+        .balance-amount {
+            font-size: 36px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .eye-icon {
+            background: rgba(74, 144, 226, 0.2);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            color: #4a90e2;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+        }
+
+        .transactions-section {
+            background: #1e2736;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h3 {
+            font-size: 18px;
+            color: #e1e8f0;
+        }
+
+        .view-all {
+            color: #4a90e2;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #2d3748;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-info h4 {
+            font-size: 15px;
+            color: #e1e8f0;
+            margin-bottom: 5px;
+        }
+
+        .transaction-info p {
+            font-size: 13px;
+            color: #9aa5b8;
+        }
+
+        .transaction-amount {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .transaction-amount.positive {
+            color: #4CAF50;
+        }
+
+        .transaction-amount.negative {
+            color: #f44336;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9aa5b8;
+        }
+
+        /* Withdraw/Deposit Page */
+        .transaction-page {
+            background: #1e2736;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #1a2332, #2d3748);
+            padding: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: rgba(74, 144, 226, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            color: #4a90e2;
+        }
+
+        .page-header h2 {
+            font-size: 20px;
+            color: #e1e8f0;
+        }
+
+        .transaction-form {
+            padding: 30px 20px;
+        }
+
+        .success-message {
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .error-message {
+            background: #f44336;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1e2736;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+            padding: 10px 0;
+            border-top: 1px solid #2d3748;
+        }
+
+        .nav-item {
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            color: #9aa5b8;
+            font-size: 12px;
+            border: none;
+            background: none;
+        }
+
+        .nav-item.active {
+            color: #4a90e2;
+        }
+
+        .nav-item div {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login/Register Page -->
+        <div id="authPage" class="page active auth-page">
+            <div class="logo">
+                <h1>💙 CashSplash NG 🪙</h1>
+                <p>Your trusted financial partner</p>
+            </div>
+            <form id="authForm">
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="authPhone" placeholder="08012345678" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="authPassword" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Continue</button>
+            </form>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboardPage" class="page dashboard">
+            <div class="dashboard-header">
+                <div class="welcome">
+                    <h2>Welcome back!</h2>
+                    <p id="userPhone"></p>
+                </div>
+                <div class="header-icons">
+                    <button class="icon-btn">🔔</button>
+                    <button class="icon-btn" onclick="logout()">👤</button>
+                </div>
+            </div>
+
+            <div class="balance-card">
+                <div class="balance-label">Available Balance</div>
+                <div class="balance-amount">
+                    <span id="balanceDisplay">₦200,000.00</span>
+                    <button class="eye-icon" onclick="toggleBalance()">👁️</button>
+                </div>
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="showWithdraw()">Withdraw</button>
+                    <button class="action-btn" onclick="showDeposit()">Deposit</button>
+                </div>
+            </div>
+
+            <div class="transactions-section">
+                <div class="section-header">
+                    <h3>Recent Transactions</h3>
+                    <a href="#" class="view-all">View All</a>
+                </div>
+                <div id="transactionsList">
+                    <div class="empty-state">
+                        <p>No transactions yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="height: 80px;"></div>
+
+            <div class="bottom-nav">
+                <button class="nav-item active">
+                    <div>🏠</div>
+                    <div>Home</div>
+                </button>
+                <button class="nav-item">
+                    <div>📊</div>
+                    <div>Transactions</div>
+                </button>
+                <button class="nav-item" onclick="logout()">
+                    <div>⚙️</div>
+                    <div>Settings</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Withdraw Page -->
+        <div id="withdrawPage" class="page transaction-page">
+            <div class="page-header">
+                <button class="back-btn" onclick="backToDashboard()">←</button>
+                <h2>Withdraw Funds</h2>
+            </div>
+            <div class="transaction-form">
+                <div class="success-message" id="withdrawSuccess">Withdrawal approved successfully!</div>
+                <div class="error-message" id="withdrawError">Invalid code. Please try again.</div>
+                <form id="withdrawForm">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="withdrawName" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Account Number</label>
+                        <input type="text" id="withdrawAccount" placeholder="Enter account number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Bank</label>
+                        <select id="withdrawBank" required>
+                            <option value="">Select your bank</option>
+                            <option value="Access Bank">Access Bank</option>
+                            <option value="Zenith Bank">Zenith Bank</option>
+                            <option value="First Bank of Nigeria">First Bank of Nigeria</option>
+                            <option value="GTBank">GTBank (Guaranty Trust Bank)</option>
+                            <option value="UBA">UBA (United Bank for Africa)</option>
+                            <option value="Fidelity Bank">Fidelity Bank</option>
+                            <option value="Union Bank">Union Bank</option>
+                            <option value="Ecobank">Ecobank</option>
+                            <option value="Wema Bank">Wema Bank</option>
+                            <option value="Polaris Bank">Polaris Bank</option>
+                            <option value="Opay">Opay</option>
+                            <option value="PalmPay">PalmPay</option>
+                            <option value="Moniepoint">Moniepoint</option>
+                            <option value="Kuda Bank">Kuda Bank</option>
+                            <option value="Carbon">Carbon</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount (₦)</label>
+                        <input type="number" id="withdrawAmount" placeholder="Enter amount" required>
+                    </div>
+                    <div class="form-group">
+                        <label>5-Digit Code</label>
+                        <input type="text" id="withdrawCode" placeholder="Enter your code (e.g., A4827)" required maxlength="5">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Withdrawal</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Deposit Page -->
+        <div id="depositPage" class="page transaction-page">
+            <div class="page-header">
+                <button class="back-btn" onclick="backToDashboard()">←</button>
+                <h2>Deposit Funds</h2>
+            </div>
+            <div class="transaction-form">
+                <div class="success-message" id="depositSuccess">Deposit approved successfully!</div>
+                <div class="error-message" id="depositError">Invalid code. Please try again.</div>
+                <form id="depositForm">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="depositName" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Account Number</label>
+                        <input type="text" id="depositAccount" placeholder="Enter account number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Bank</label>
+                        <select id="depositBank" required>
+                            <option value="">Select your bank</option>
+                            <option value="Access Bank">Access Bank</option>
+                            <option value="Zenith Bank">Zenith Bank</option>
+                            <option value="First Bank of Nigeria">First Bank of Nigeria</option>
+                            <option value="GTBank">GTBank (Guaranty Trust Bank)</option>
+                            <option value="UBA">UBA (United Bank for Africa)</option>
+                            <option value="Fidelity Bank">Fidelity Bank</option>
+                            <option value="Union Bank">Union Bank</option>
+                            <option value="Ecobank">Ecobank</option>
+                            <option value="Wema Bank">Wema Bank</option>
+                            <option value="Polaris Bank">Polaris Bank</option>
+                            <option value="Opay">Opay</option>
+                            <option value="PalmPay">PalmPay</option>
+                            <option value="Moniepoint">Moniepoint</option>
+                            <option value="Kuda Bank">Kuda Bank</option>
+                            <option value="Carbon">Carbon</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount (₦)</label>
+                        <input type="number" id="depositAmount" placeholder="Enter amount" required>
+                    </div>
+                    <div class="form-group">
+                        <label>5-Digit Code</label>
+                        <input type="text" id="depositCode" placeholder="Enter your code (e.g., A4827)" required maxlength="5">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Deposit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize OneSignal
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.init({
+                appId: "113a0ba5-652a-4ce0-b602-c13ab7e9858b",
+            });
+        });
+
+        // Valid codes
+        const validCodes = ['A4827','B1935','C7401','D8562','E3094','F6218','G0753','H9486','J5120','K3847','L2609','M8371','N1948','P5602','Q7284','R4319','S8056','T1297','U6740','V9035'];
+
+        // Used codes tracking
+        let usedCodes = JSON.parse(localStorage.getItem('cashsplash_used_codes')) || [];
+
+        // User data
+        let users = JSON.parse(localStorage.getItem('cashsplash_users')) || {};
+        let currentUser = localStorage.getItem('cashsplash_current_user');
+        let balanceVisible = true;
+
+        // Show/hide pages
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function showDashboard() {
+            showPage('dashboardPage');
+            updateDashboard();
+        }
+
+ function showWithdraw() {
+            showPage('withdrawPage');
+        }
+
+        function showDeposit() {
+            showPage('depositPage');
+        }
+
+        function backToDashboard() {
+            showDashboard();
+        }
+
+        // Auth (Login/Register combined)
+        document.getElementById('authForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const phone = document.getElementById('authPhone').value;
+            const password = document.getElementById('authPassword').value;
+
+            // Create unique key with phone + password
+            const accountKey = phone + '_' + password;
+
+            // If account doesn't exist, create it automatically
+            if (!users[accountKey]) {
+                users[accountKey] = {
+                    phone: phone,
+                    password: password,
+                    balance: 200000,
+                    transactions: [],
+                    hasWithdrawn: false
+                };
+                localStorage.setItem('cashsplash_users', JSON.stringify(users));
+            }
+
+            // Login to the account
+            currentUser = accountKey;
+            localStorage.setItem('cashsplash_current_user', currentUser);
+            showDashboard();
+        });
+
+        // Update dashboard
+        function updateDashboard() {
+            document.getElementById('userPhone').textContent = users[currentUser].phone;
+            const balance = users[currentUser].balance;
+            updateBalanceDisplay(balance);
+            displayTransactions();
+        }
+
+        function updateBalanceDisplay(balance) {
+            const display = document.getElementById('balanceDisplay');
+            if (balanceVisible) {
+                display.textContent = '₦' + balance.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            } else {
+                display.textContent = '₦****';
+            }
+        }
+
+        function toggleBalance() {
+            balanceVisible = !balanceVisible;
+            updateBalanceDisplay(users[currentUser].balance);
+        }
+
+        function displayTransactions() {
+            const list = document.getElementById('transactionsList');
+            const transactions = users[currentUser].transactions;
+
+            if (transactions.length === 0) {
+                list.innerHTML = '<div class="empty-state"><p>No transactions yet</p></div>';
+                return;
+            }
+
+            list.innerHTML = transactions.slice(-5).reverse().map(t => `
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <h4>${t.type} - ${t.bank}</h4>
+                        <p>${t.date}</p>
+                    </div>
+                    <div class="transaction-amount ${t.type === 'Deposit' ? 'positive' : 'negative'}">
+                        ${t.type === 'Deposit' ? '+' : '-'}₦${t.amount.toLocaleString()}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Send push notification via OneSignal
+        async function sendPushNotification(title, message) {
+            try {
+                // Request notification permission first
+                const permission = await window.OneSignal.Notifications.requestPermission();
+                
+                if (permission) {
+                    // Show browser push notification
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification(title, {
+                            body: message,
+                            icon: '💙',
+                            badge: '🪙'
+                        });
+                    }
+                }
+            } catch (error) {
+                console.log('Notification error:', error);
+            }
+        }
+
+        // Withdraw
+        document.getElementById('withdrawForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Check if user has already withdrawn
+            if (users[currentUser].hasWithdrawn) {
+                alert('You have already made a withdrawal. Only one withdrawal is allowed per account.');
+                return;
+            }
+
+            const code = document.getElementById('withdrawCode').value.toUpperCase();
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const name = document.getElementById('withdrawName').value;
+            const account = document.getElementById('withdrawAccount').value;
+            const bank = document.getElementById('withdrawBank').value;
+
+            // Check if code has been used before
+            if (usedCodes.includes(code)) {
+                document.getElementById('withdrawError').textContent = 'This code has already been used.';
+                document.getElementById('withdrawError').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('withdrawError').style.display = 'none';
+                }, 3000);
+                return;
+            }
+
+            if (!validCodes.includes(code)) {
+                document.getElementById('withdrawError').textContent = 'Invalid code. Please try again.';
+                document.getElementById('withdrawError').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('withdrawError').style.display = 'none';
+                }, 3000);
+                return;
+            }
+
+            if (amount > users[currentUser].balance) {
+                alert('Insufficient balance!');
+                return;
+            }
+
+            // Mark code as used
+            usedCodes.push(code);
+            localStorage.setItem('cashsplash_used_codes', JSON.stringify(usedCodes));
+
+            // Mark user as having withdrawn
+            users[currentUser].hasWithdrawn = true;
+            users[currentUser].balance -= amount;
+            users[currentUser].transactions.push({
+                type: 'Withdrawal',
+                amount: amount,
+                bank: bank,
+                date: new Date().toLocaleString()
+            });
+
+            localStorage.setItem('cashsplash_users', JSON.stringify(users));
+
+            document.getElementById('withdrawSuccess').style.display = 'block';
+            
+            // Send push notification
+            await sendPushNotification(
+                '💰 Withdrawal Approved',
+                `Your withdrawal of ₦${amount.toLocaleString()} has been approved successfully!`
+            );
+
+            setTimeout(() => {
+                document.getElementById('withdrawSuccess').style.display = 'none';
+                document.getElementById('withdrawForm').reset();
+                backToDashboard();
+            }, 2000);
+        });
+
+        // Deposit
+        document.getElementById('depositForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const code = document.getElementById('depositCode').value.toUpperCase();
+            const amount = parseFloat(document.getElementById('depositAmount').value);
+            const name = document.getElementById('depositName').value;
+            const account = document.getElementById('depositAccount').value;
+            const bank = document.getElementById('depositBank').value;
+
+            // Check if code has been used before
+            if (usedCodes.includes(code)) {
+                document.getElementById('depositError').textContent = 'This code has already been used.';
+                document.getElementById('depositError').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('depositError').style.display = 'none';
+                }, 3000);
+                return;
+            }
+
+            if (!validCodes.includes(code)) {
+                document.getElementById('depositError').textContent = 'Invalid code. Please try again.';
+                document.getElementById('depositError').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('depositError').style.display = 'none';
+                }, 3000);
+                return;
+            }
+
+            // Mark code as used
+            usedCodes.push(code);
+            localStorage.setItem('cashsplash_used_codes', JSON.stringify(usedCodes));
+
+            users[currentUser].balance += amount;
+            users[currentUser].transactions.push({
+                type: 'Deposit',
+                amount: amount,
+                bank: bank,
+                date: new Date().toLocaleString()
+            });
+
+            localStorage.setItem('cashsplash_users', JSON.stringify(users));
+
+            document.getElementById('depositSuccess').style.display = 'block';
+            
+            // Send push notification
+            await sendPushNotification(
+                '💚 Deposit Approved',
+                `Your deposit of ₦${amount.toLocaleString()} has been approved successfully!`
+            );
+
+            setTimeout(() => {
+                document.getElementById('depositSuccess').style.display = 'none';
+                document.getElementById('depositForm').reset();
+                backToDashboard();
+            }, 2000);
+        });
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('cashsplash_current_user');
+                currentUser = null;
+                showPage('authPage');
+            }
+        }
+
+        // Check if user is logged in
+        if (currentUser && users[currentUser]) {
+            showDashboard();
+        } else {
+            showPage('authPage');
+        }
+    </script>
+</body>
+</html>       
